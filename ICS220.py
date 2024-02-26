@@ -1,82 +1,81 @@
-class BoardingPass:
-    """A class to represent a boarding pass for  flight."""
+from datetime import datetime
 
-    def set_terminal(self, terminal):
-        """Sets the terminal for the boarding pass."""
-        self._terminal = terminal
+class Flight:
+    def __init__(self, flight_number, departure_time, arrival_time, capacity):
+        self.flightNumber = flight_number
+        self.departureTime = departure_time
+        self.arrivalTime = arrival_time
+        self.capacity = capacity
+        self.tickets = []
 
-    def __init__(self, passenger_name, from_location, to_location, departure_time, arrival_time, terminal,
-                 electronic_ticket):
-        """Initializes a BoardingPass with all necessary details."""
-        self._passenger_name = passenger_name
-        self._from_location = from_location
-        self._to_location = to_location
-        self._departure_time = departure_time
-        self._arrival_time = arrival_time
-        self._terminal = terminal
-        self._electronic_ticket = electronic_ticket
+    def createTicket(self):
+        new_ticket = Ticket(self)
+        self.tickets.append(new_ticket)
+        return new_ticket
 
-    # Setters and getters are used to encapsulate the data
-    # and to provide controlled access to the properties of the class.
+    def getPassengerList(self):
+        return [ticket.getPassenger() for ticket in self.tickets if ticket.getPassenger()]
 
-    def set_passenger_name(self, name):
-        """Updates the passenger name on the boarding pass."""
-        self._passenger_name = name
+class Ticket:
+    def __init__(self, flight):
+        self.flight = flight
+        self.passenger = None
 
-    def get_passenger_name(self):
-        """Returns the passenger name."""
-        return self._passenger_name
+    def __str__(self):
+        return f"Ticket for Flight {self.flight.flightNumber}"
 
-    # Additional setters and getters would follow the same pattern.
+    def bookFlight(self):
+        if not self.passenger:
+            self.passenger = Passenger(self)
+        return self.passenger
 
-    def display_boarding_pass(self):
-        """Prints the boarding pass details."""
-        print("Boarding Pass for:", self._passenger_name)
-        print("From:", self._from_location, "To:", self._to_location)
-        print("Departure:", self._departure_time, "Arrival:", self._arrival_time)
-        print("Terminal:", self._terminal, "Ticket No.:", self._electronic_ticket)
-
+    def getPassenger(self):
+        return self.passenger
 
 class Passenger:
-    """A class to represent an airline passenger."""
+    def __init__(self, ticket):
+        self.ticket = ticket
 
-    def __init__(self, name):
-        """Initializes a Passenger with a name."""
-        self._name = name
-        self._boarding_pass = None
+    def __str__(self):
+        return f"Passenger with {self.ticket}"
 
-    def set_boarding_pass(self, boarding_pass):
-        """Assigns a boarding pass to the passenger."""
-        self._boarding_pass = boarding_pass
+    def checkIn(self):
+        print(f"{self} has checked in.")
 
-    def get_name(self):
-        """Returns the passenger's name."""
-        return self._name
+    def requestLoungeAccess(self):
+        print(f"{self} has requested lounge access.")
 
-    def display_boarding_info(self):
-        """Displays boarding information if the passenger has a boarding pass."""
-        if self._boarding_pass:
-            self._boarding_pass.display_boarding_pass()
-        else:
-            print(f"No boarding pass information for {self._name}.")
+class Lounge:
+    def __init__(self):
+        # Initialize any necessary attributes
+        pass
 
+    def verifyAccess(self, passenger):
+        # Placeholder logic to verify access, returning True for demonstration
+        return True
 
-# Create an instance of the Passenger class
-passenger = Passenger("JAMES SMITH")
-boarding_pass = BoardingPass(
-    passenger_name="JAMES SMITH",
-    from_location="Chicago ORD",
-    to_location="New York JFK",
-    departure_time="11:40",
-    arrival_time="13:30",
-    terminal="2",
-    electronic_ticket="629"
-)
+    def listAmenities(self):
+        # Placeholder logic to list amenities
+        return ["Free Wi-Fi", "Refreshments", "Comfortable Seating"]
 
-passenger.set_boarding_pass(boarding_pass)
+# Example Usage
+flight = Flight("F123", datetime.now(), datetime.now(), 200)
 
-passenger.display_boarding_info()
+ticket1 = flight.createTicket()
+passenger1 = ticket1.bookFlight()
 
-boarding_pass.set_terminal("3")
+ticket2 = flight.createTicket()
+passenger2 = ticket2.bookFlight()
 
-passenger.display_boarding_info()
+passenger3 = flight.createTicket().bookFlight()
+
+passenger_list = flight.getPassengerList()
+
+lounge = Lounge()
+
+for passenger in passenger_list:
+    print(f"{passenger} on Flight {flight.flightNumber}")
+    if lounge.verifyAccess(passenger):
+        print(f"Access to the lounge verified for {passenger}")
+        amenities = lounge.listAmenities()
+        print(f"Amenities available: {', '.join(amenities)}")
